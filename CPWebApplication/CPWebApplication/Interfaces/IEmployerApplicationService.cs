@@ -6,5 +6,7 @@ namespace CPWebApplication.Interfaces
     {
         Task AddEmployerApplicationAsync(EmployerApplication application);
         Task<EmployerApplication> UpadteEmployerApplicationAsync(EmployerApplication application);
+
+        Task<List<QuestionModel>> GetQuestionsByTypeAsync(string applicationId, string partitionKey, string questionType);
     }
 }

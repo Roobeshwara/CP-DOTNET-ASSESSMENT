@@ -41,5 +41,19 @@ namespace CPWebApplication.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet]
+        [Route("GetQuestionsByType")]
+        public async Task<IActionResult> GetQuestionsByType(string applicationId, string programTitle,string questionType)
+        {
+            try
+            {
+                var result = await _employerApplicationService.GetQuestionsByTypeAsync(applicationId, programTitle, questionType);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

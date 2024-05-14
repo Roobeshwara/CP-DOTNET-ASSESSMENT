@@ -75,5 +75,21 @@ namespace CPWebApplication.Services
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<List<QuestionModel>> GetQuestionsByTypeAsync(string applicationId, string partitionKey, string questionType)
+        {
+            try
+            {
+                ItemResponse<EmployerApplication> response = await _container.ReadItemAsync<EmployerApplication>(applicationId, new PartitionKey(partitionKey));
+                var existingItem = response.Resource;
+                //Remove all other types
+                List<QuestionModel> typedQuestions = existingItem.Questions.Where(q => q.Type == questionType).ToList();
+
+                return typedQuestions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
