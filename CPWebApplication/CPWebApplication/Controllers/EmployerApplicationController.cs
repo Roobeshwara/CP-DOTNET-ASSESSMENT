@@ -27,5 +27,19 @@ namespace CPWebApplication.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut]
+        [Route("UpdateEmployerApplication")]
+        public async Task<IActionResult> UpdateEmployerApplication(EmployerApplication application)
+        {
+            try
+            {
+                var result = await _employerApplicationService.UpadteEmployerApplicationAsync(application);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

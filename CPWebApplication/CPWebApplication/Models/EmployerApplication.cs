@@ -27,6 +27,7 @@
     }
     public class QuestionModel
     {
+        public string? id { get; set; }
         public string? Type { get; set; }
         public string? Question { get; set; }
         // Properties specific to certain question types
