@@ -1,3 +1,5 @@
+using CPWebApplication.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,6 +10,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+//Initializing the required services
+AppSettings.Initialize(app.Configuration);
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
