@@ -1,7 +1,7 @@
 ﻿using CPWebApplication.Interfaces;
 using CPWebApplication.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 
 namespace CPWebApplication.Controllers
 {
@@ -22,9 +22,18 @@ namespace CPWebApplication.Controllers
             {
                 await _candidateApplicationService.AddCandidateApplicationAsync(application);
                 return Ok("Record Inserted");
-            }catch(Exception ex)
+            }
+            catch (CosmosException cosmosEx) when (cosmosEx.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
-                return BadRequest(ex.Message);
+                return Conflict("Duplicate record. Record already exists.");
+            }
+            catch (CosmosException cosmosEx) when (cosmosEx.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return NotFound("Resource not found.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Failed to insert record: " + ex.Message);
             }
         }
     }

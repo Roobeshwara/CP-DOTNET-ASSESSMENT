@@ -39,7 +39,7 @@ namespace CPWebApplicationTest
             // Arrange
             var application = new CandidateApplication
             {
-                id = "14",
+                id = "1000",
                 FirstName = "John",
                 LastName = "Doe",
                 PhoneNumber = "+1234567890",
@@ -74,7 +74,7 @@ namespace CPWebApplicationTest
             //Using already taken Id
             var application = new CandidateApplication
             {
-                id = "2",
+                id = "1",
                 FirstName = "John",
                 LastName = "Doe",
                 PhoneNumber = "+1234567890",
@@ -98,9 +98,10 @@ namespace CPWebApplicationTest
             // Assert
 
             // Check that the IActionResult is of type BadRequestObjectResult
-            Assert.IsType<BadRequestObjectResult>(result);
+            Assert.IsType<ConflictObjectResult>(result);
             // Cast the result to BadRequestObjectResult and verify its value
-            var badRequestResult = result as BadRequestObjectResult;
+            var duplicateResult = result as ConflictObjectResult;
+            Assert.Equal("Duplicate record. Record already exists.", duplicateResult.Value);
         }
     }
 }

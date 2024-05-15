@@ -1,6 +1,8 @@
 ﻿using CPWebApplication.Interfaces;
 using CPWebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
+using System.Net;
 
 namespace CPWebApplication.Controllers
 {
@@ -22,9 +24,17 @@ namespace CPWebApplication.Controllers
                 await _employerApplicationService.AddEmployerApplicationAsync(application);
                 return Ok("Record Inserted");
             }
+            catch (CosmosException cosmosEx) when (cosmosEx.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                return Conflict("Duplicate record. Record already exists.");
+            }
+            catch (CosmosException cosmosEx) when (cosmosEx.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return NotFound("Resource not found.");
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Failed to insert record: " + ex.Message);
             }
         }
         [HttpPut]
@@ -36,6 +46,21 @@ namespace CPWebApplication.Controllers
                 var result = await _employerApplicationService.UpadteEmployerApplicationAsync(application);
                 return Ok(result);
             }
+            catch (CosmosException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return NotFound("Employer application not found.");
+                }
+                else if (ex.StatusCode == HttpStatusCode.PreconditionFailed)
+                {
+                    return Conflict("Update conflict occurred. Please try again.");
+                }
+                else
+                {
+                    return StatusCode((int)ex.StatusCode, "An error occurred while updating the employer application.");
+                }
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -43,12 +68,27 @@ namespace CPWebApplication.Controllers
         }
         [HttpGet]
         [Route("GetQuestionsByType")]
-        public async Task<IActionResult> GetQuestionsByType(string applicationId, string programTitle,string questionType)
+        public async Task<IActionResult> GetQuestionsByType(string applicationId,string questionType)
         {
             try
             {
-                var result = await _employerApplicationService.GetQuestionsByTypeAsync(applicationId, programTitle, questionType);
+                var result = await _employerApplicationService.GetQuestionsByTypeAsync(applicationId, questionType);
                 return Ok(result);
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return NotFound("Employer application not found.");
+                }
+                else if (ex.StatusCode == HttpStatusCode.PreconditionFailed)
+                {
+                    return Conflict("Update conflict occurred. Please try again.");
+                }
+                else
+                {
+                    return StatusCode((int)ex.StatusCode, "An error occurred while updating the employer application.");
+                }
             }
             catch (Exception ex)
             {

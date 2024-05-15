@@ -6,7 +6,7 @@ namespace CPWebApplication.Services
 {
     public class EmployerApplicationSerivce : IEmployerApplicationService
     {
-        private static Container _container;
+        private static Container? _container;
 
         public EmployerApplicationSerivce(IConfiguration configuration)
         {
@@ -22,19 +22,19 @@ namespace CPWebApplication.Services
         {
             try
             {
-                await _container.CreateItemAsync<EmployerApplication>(application, new PartitionKey(application.ProgramTitle));
+                await _container.CreateItemAsync<EmployerApplication>(application, new PartitionKey(application.id));
             }
-            catch (Exception ex)
+            catch (CosmosException)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
         public async Task<EmployerApplication> UpadteEmployerApplicationAsync(EmployerApplication application)
         {
             try
             {
-                ItemResponse<EmployerApplication> res = await _container.ReadItemAsync<EmployerApplication>(application.id, new PartitionKey(application.ProgramTitle));
-                //Get Existing Item
+                // Read the existing item using its unique id
+                ItemResponse<EmployerApplication> res = await _container.ReadItemAsync<EmployerApplication>(application.id, new PartitionKey(application.id));
                 var existingItem = res.Resource;
                 //Replace existing item values with new values
                 existingItem.ProgramTitle = application.ProgramTitle;
@@ -73,28 +73,36 @@ namespace CPWebApplication.Services
                 // Remove questions that are not present in the updated application
                 existingItem.Questions.RemoveAll(q => !application.Questions.Any(aq => aq.id == q.id));
 
-                var updateRes = await _container.ReplaceItemAsync(existingItem, application.id, new PartitionKey(application.ProgramTitle));
+                var updateRes = await _container.ReplaceItemAsync(existingItem, application.id, new PartitionKey(application.id));
                 return updateRes.Resource;
             }
-            catch (Exception ex)
+            catch (CosmosException)
             {
-                throw new Exception(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
-        public async Task<List<QuestionModel>> GetQuestionsByTypeAsync(string applicationId, string partitionKey, string questionType)
+        public async Task<List<QuestionModel>> GetQuestionsByTypeAsync(string applicationId, string questionType)
         {
             try
             {
-                ItemResponse<EmployerApplication> response = await _container.ReadItemAsync<EmployerApplication>(applicationId, new PartitionKey(partitionKey));
+                ItemResponse<EmployerApplication> response = await _container.ReadItemAsync<EmployerApplication>(applicationId, new PartitionKey(applicationId));
                 var existingItem = response.Resource;
                 //Remove all other types
                 List<QuestionModel> typedQuestions = existingItem.Questions.Where(q => q.Type == questionType).ToList();
 
                 return typedQuestions;
             }
-            catch (Exception ex)
+            catch (CosmosException)
             {
-                throw new Exception(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }

@@ -5,18 +5,18 @@ namespace CPWebApplication.Services
     public class CosmosDBConnectionService
     {
         //Cosmos Credentials
-        static private string cosmosUri;
-        static private string primaryKey;
+        static private string? cosmosUri;
+        static private string? primaryKey;
 
         // The Cosmos client instance
-        static private CosmosClient cosmosClient;
+        static private CosmosClient? cosmosClient;
 
         // The database
-        static private Database database;
+        static private Database? database;
 
         // The container
-        static public Container EmployerApplicationContainer;
-        static public Container CandidateApplicationContainer;
+        static public Container? EmployerApplicationContainer;
+        static public Container? CandidateApplicationContainer;
 
         // The name of the database
         static private string databaseId = "ApplicationManagementDB";
@@ -26,14 +26,30 @@ namespace CPWebApplication.Services
         static private string candidateApllicationContainerId = "CandidateApplication";
         public static async Task GetStartedCosmosDBAsync(IConfiguration configuration)
         {
-            // Create a new instance of the Cosmos Client
-            cosmosUri = configuration["CosmosCredentials:EndpointUri"];
-            primaryKey = configuration["CosmosCredentials:PrimaryKey"];
-            cosmosClient = new CosmosClient(cosmosUri, primaryKey, new CosmosClientOptions() { ApplicationName = "CosmosDBDotnetQuickstart" });
-            await CreateDatabaseAsync();
-            await CreateContainersAsync();
-            await ScaleContainersAsync();
-            Console.WriteLine("DB and Containers are created!");
+
+            try
+            {
+                // Initialize Cosmos client
+                cosmosUri = configuration["CosmosCredentials:EndpointUri"];
+                primaryKey = configuration["CosmosCredentials:PrimaryKey"];
+                cosmosClient = new CosmosClient(cosmosUri, primaryKey, new CosmosClientOptions() { ApplicationName = "CosmosDBDotnetQuickstart" });
+
+                // Create database and containers
+                await CreateDatabaseAsync();
+                await CreateContainersAsync();
+                await ScaleContainersAsync();
+                Console.WriteLine("DB and Containers are created!");
+            }
+            catch (CosmosException ex)
+            {
+                Console.WriteLine($"Cosmos Exception: {ex.StatusCode} - {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected Exception: {ex.Message}");
+                throw;
+            }
         }
 
         private static async Task CreateDatabaseAsync()
@@ -44,8 +60,8 @@ namespace CPWebApplication.Services
         private static async Task CreateContainersAsync()
         {
             // Create a new containers
-            EmployerApplicationContainer = await database.CreateContainerIfNotExistsAsync(employerApplicationContainerId, "/ProgramTitle", 400);
-            CandidateApplicationContainer = await database.CreateContainerIfNotExistsAsync(candidateApllicationContainerId, "/FirstName", 400);
+            EmployerApplicationContainer = await database.CreateContainerIfNotExistsAsync(employerApplicationContainerId, "/id", 400);
+            CandidateApplicationContainer = await database.CreateContainerIfNotExistsAsync(candidateApllicationContainerId, "/id", 400);
         }
         private static async Task ScaleContainersAsync()
         {

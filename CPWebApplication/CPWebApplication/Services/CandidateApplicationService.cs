@@ -6,7 +6,7 @@ namespace CPWebApplication.Services
 {
     public class CandidateApplicationService : ICandidateApplicationService
     {
-        private static Container _container;
+        private static Container? _container;
 
         public CandidateApplicationService(IConfiguration configuration)
         {
@@ -23,10 +23,10 @@ namespace CPWebApplication.Services
         {
             try
             {
-                await _container.CreateItemAsync<CandidateApplication>(application, new PartitionKey(application.FirstName));
-            }catch(Exception ex)
+                await _container.CreateItemAsync<CandidateApplication>(application, new PartitionKey(application.id));
+            }catch(CosmosException)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
     }
