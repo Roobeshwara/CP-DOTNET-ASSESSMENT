@@ -5,8 +5,8 @@ namespace CPWebApplication.Services
     public class CosmosDBConnectionService
     {
         //Cosmos Credentials
-        static readonly string cosmosUri = AppSettings.CosmosUri;
-        static readonly string primaryKey = AppSettings.PrimaryKey;
+        static private string cosmosUri;
+        static private string primaryKey;
 
         // The Cosmos client instance
         static private CosmosClient cosmosClient;
@@ -24,9 +24,11 @@ namespace CPWebApplication.Services
         // The name of required containers
         static private string employerApplicationContainerId = "EmployerApplication";
         static private string candidateApllicationContainerId = "CandidateApplication";
-        public static async Task GetStartedCosmosDBAsync()
+        public static async Task GetStartedCosmosDBAsync(IConfiguration configuration)
         {
             // Create a new instance of the Cosmos Client
+            cosmosUri = configuration["CosmosCredentials:EndpointUri"];
+            primaryKey = configuration["CosmosCredentials:PrimaryKey"];
             cosmosClient = new CosmosClient(cosmosUri, primaryKey, new CosmosClientOptions() { ApplicationName = "CosmosDBDotnetQuickstart" });
             await CreateDatabaseAsync();
             await CreateContainersAsync();

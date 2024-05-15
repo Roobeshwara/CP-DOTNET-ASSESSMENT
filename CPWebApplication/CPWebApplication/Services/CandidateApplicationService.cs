@@ -8,10 +8,17 @@ namespace CPWebApplication.Services
     {
         private static Container _container;
 
-        public static void Initialize(Container container)
+        public CandidateApplicationService(IConfiguration configuration)
         {
-            _container = container;
+            InitializeContainerAsync(configuration).Wait(); // Call an async method synchronously
         }
+
+        private async Task InitializeContainerAsync(IConfiguration configuration)
+        {
+            await CosmosDBConnectionService.GetStartedCosmosDBAsync(configuration);
+            _container = CosmosDBConnectionService.CandidateApplicationContainer;
+        }
+
         public async Task AddCandidateApplicationAsync(CandidateApplication application)
         {
             try

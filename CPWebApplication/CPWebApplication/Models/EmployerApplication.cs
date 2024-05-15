@@ -15,11 +15,12 @@
         public string? Nationality { get; set; }
         public string? CurrentResidance { get; set; }
         public string? IDNumber { get; set; }
-        public DateOnly? DateOFBirth { get; set; }
+        public DateTime? DateOFBirth { get; set; }
         public string? Gender { get; set; }
         #endregion
 
         public List<QuestionModel> Questions { get; set; }
+
         public EmployerApplication()
         {
             Questions = new List<QuestionModel>();

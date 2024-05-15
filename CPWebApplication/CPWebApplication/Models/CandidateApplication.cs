@@ -11,7 +11,7 @@
         public string? Nationality { get; set; }
         public string? CurrentResidance { get; set; }
         public string? IDNumber { get; set; }
-        public DateOnly? DateOFBirth { get; set; }
+        public DateTime? DateOFBirth { get; set; }
         public string? Gender { get; set; }
         #endregion
         #region Additonal questions
@@ -21,7 +21,7 @@
         public List<string>? CandidateInterest { get; set; }
         public bool IsRejectedByUkEmbassy { get; set; }
         public int YearsOfExperince { get; set; }
-        public DateOnly? DateMovedToUK { get; set; }
+        public DateTime? DateMovedToUK { get; set; }
         #endregion
     }
 }
